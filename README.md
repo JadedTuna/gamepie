@@ -10,6 +10,12 @@ using Python. Currently it supports:
     * Mac (Not tested)
     * Android (QPython && PyGame)
 
+# License
+GamePie is licensed under zlib license which means you
+can freely modify the source code, re-distrubute it
+and use the engine in commercial applications. Link
+to this page is appreciated but not required :).
+
 # Examples
 Check `examples/` to see some example games.
 
