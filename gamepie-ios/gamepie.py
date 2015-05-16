@@ -18,7 +18,7 @@ class Game(object):
     def __init__(self):
         self.__running = True
         self.title = "GamePie"
-        self.gamepie = gamepie.getVersion
+        self.gamepie = gamepie.getVersion()
         self.size = (640, 480)
 
     def conf(self):
@@ -36,10 +36,10 @@ class Game(object):
     def mousemoved(self, x, y, dx, dy):
         pass
 
-    def update(self):
+    def update(self, dt):
         pass
 
-    def draw(self):
+    def draw(self, dt):
         pass
 
     def exit(self):
@@ -47,6 +47,7 @@ class Game(object):
 
     def isRunning(self):
         return self.__running
+
 
 class ErrorPie(Game):
     def __init__(self, text):
@@ -57,8 +58,9 @@ class ErrorPie(Game):
     def load(self):
         gamepie.graphics.setBackgroundColor(80, 80, 255)
 
-    def draw(self):
-        gamepie.graphics.write(self.text, 0, 0)
+    def draw(self, dt):
+        gamepie.graphics.write(self.text, 60, 60)
+
 
 class PieScene(scene.Scene):
     def __init__(self, game):
@@ -111,8 +113,12 @@ def run(game, frame_delay=1):
         setattr(gamepie, module,
             importlib.import_module("gamepie." + module))
 
-    if "graphics" in __required__:
-        gamepie.graphics.setSetting("width", game.size[0])
-        gamepie.graphics.setSetting("height", game.size[1])
+    if not "graphics" in __required__:
+        # We need this module any way
+        setattr(gamepie, "graphics",
+            importlib.import_module("gamepie.graphics"))
+
+    gamepie.graphics.setSetting("width", game.size[0])
+    gamepie.graphics.setSetting("height", game.size[1])
 
     scene.run(PieScene(game), frame_interval=frame_delay)

@@ -18,7 +18,7 @@ class Game(object):
     def __init__(self):
         self.__running = True
         self.title = "GamePie"
-        self.gamepie = gamepie.getVersion
+        self.gamepie = gamepie.getVersion()
         self.size = (640, 480)
 
     def conf(self):
@@ -36,10 +36,10 @@ class Game(object):
     def mousemoved(self, x, y, dx, dy):
         pass
 
-    def update(self):
+    def update(self, dt):
         pass
 
-    def draw(self):
+    def draw(self, dt):
         pass
 
     def exit(self):
@@ -47,6 +47,7 @@ class Game(object):
 
     def isRunning(self):
         return self.__running
+
 
 class ErrorPie(Game):
     def __init__(self, text):
@@ -57,8 +58,8 @@ class ErrorPie(Game):
     def load(self):
         gamepie.graphics.setBackgroundColor(80, 80, 255)
 
-    def draw(self):
-        gamepie.graphics.write(self.text, 0, 0)
+    def draw(self, dt):
+        gamepie.graphics.write(self.text, 60, 60)
 
 def getVersion():
     return __version__
@@ -80,13 +81,17 @@ def run(game, frame_delay=1):
         setattr(gamepie, module,
             importlib.import_module("gamepie." + module))
 
+    if not "graphics" in __required__:
+        # We need this module any way
+        setattr(gamepie, "graphics",
+            importlib.import_module("gamepie.graphics"))
+
     pygame.init()
     window = pygame.display.set_mode(game.size)
     pygame.display.set_caption(game.title)
 
-    if "graphics" in __required__:
-        gamepie.graphics.setSetting("width", game.size[0])
-        gamepie.graphics.setSetting("height", game.size[1])
+    gamepie.graphics.setSetting("width", game.size[0])
+    gamepie.graphics.setSetting("height", game.size[1])
     game.load()
 
     delay = 60/frame_delay
@@ -98,9 +103,11 @@ def run(game, frame_delay=1):
             if event.type == pygame.QUIT:
                 game.exit()
 
-            elif event.type == pygame.KEYUP:
+            elif event.type == pygame.KEYUP and \
+                    "keyboard" in __required__:
                 keyboard.setKey(event.key, False)
-            elif event.type == pygame.KEYDOWN:
+            elif event.type == pygame.KEYDOWN and \
+                    "keyboard" in __required__:
                 keyboard.setKey(event.key, True)
 
             elif event.type == pygame.MOUSEBUTTONUP:
